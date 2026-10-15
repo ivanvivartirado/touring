@@ -218,6 +218,12 @@
       if (Math.abs(dx) > 40) show(cur + (dx < 0 ? 1 : -1), true);                 // arrastre
       else show(cur + (e.clientX > r.left + r.width / 2 ? 1 : -1), true);         // clic o toque en un lado
     });
+    // Botones pequenos (solo se ven con raton): no cuentan como clic en la foto
+    $$('.gallery__nav', st).forEach(function (b) {
+      b.addEventListener('pointerdown', function (e) { e.stopPropagation(); });
+      b.addEventListener('pointerup', function (e) { e.stopPropagation(); });
+      b.addEventListener('click', function () { show(cur + (b.classList.contains('gallery__nav--next') ? 1 : -1), true); });
+    });
     st.addEventListener('pointercancel', function () { sx = null; st.classList.remove('is-dragging'); });
     st.addEventListener('pointermove', function (e) {
       if (e.pointerType !== 'mouse') return;
