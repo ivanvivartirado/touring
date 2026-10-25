@@ -34,7 +34,26 @@ CHROME = os.environ.get("CHROME_BIN") or next((c for c in [r"C:\Program Files\Go
 N, LADO = 6, 640
 
 
+def leer_con_playwright():
+    """En GitHub Actions: Chromium de Playwright, esperando a que salgan las fotos."""
+    from playwright.sync_api import sync_playwright
+    with sync_playwright() as pw:
+        nav = pw.chromium.launch()
+        pag = nav.new_page(locale="es-ES", user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+                           "(KHTML, like Gecko) Chrome/124.0 Safari/537.36")
+        pag.goto(PERFIL, timeout=60000)
+        pag.wait_for_selector('img[src*="t51.82787-15"]', timeout=45000)
+        posts = pag.eval_on_selector_all('img[src*="t51.82787-15"]', "els => els.map(e => ({src: e.src, alt: e.alt}))")
+        nav.close()
+    return posts[:N]
+
+
 def leer_publicaciones():
+    try:
+        import playwright  # noqa: F401  (solo esta instalado en GitHub Actions)
+        return leer_con_playwright()
+    except ImportError:
+        pass
     dom = subprocess.run([CHROME, "--headless=new", "--disable-gpu", "--no-sandbox", "--virtual-time-budget=15000",
                           "--window-size=1000,2000", "--dump-dom", PERFIL],
                          capture_output=True, timeout=120).stdout.decode("utf-8", "ignore")

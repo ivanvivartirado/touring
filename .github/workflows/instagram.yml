@@ -18,8 +18,10 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Pillow
-        run: pip install pillow
+      - name: Pillow y Playwright
+        run: |
+          pip install pillow playwright
+          python -m playwright install --with-deps chromium
       - name: Ultimas publicaciones
         run: python .github/instagram/actualizar.py --raiz .
       - name: Commit si hay cambios
