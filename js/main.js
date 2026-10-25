@@ -128,6 +128,15 @@
   /* ---------- Feed de Instagram (Behold) ---------- */
   (function () {
     var root = $('#tg-instagram'); if (!root) return;
+    // Ultimas publicaciones: tools/actualizar-instagram.py deja las fotos en assets/instagram/ y su texto en posts.json
+    fetch(BASE + 'assets/instagram/posts.json', { cache: 'no-store' }).then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (posts) {
+        $$('.ig__grid a', root).forEach(function (a, i) {
+          var p = posts[i], im = $('img', a); if (!p || !im) return;
+          im.src = BASE + p.img + '?v=' + p.v; im.alt = p.alt;
+          a.setAttribute('aria-label', 'Ver Instagram de Touring: ' + p.alt);
+        });
+      }).catch(function () { /* se quedan las fotos que haya */ });
     var url = (root.getAttribute('data-feed-url') || '').trim(); if (!url) return embed();
     var grid = $('.ig__grid', root); if (!grid) return;
     fetch(url, { cache: 'no-store' }).then(function (r) { if (!r.ok) throw new Error(r.status); return r.json(); })
